@@ -1,4 +1,5 @@
- t = 0.1:0.1:3;
+
+t = 0.1:0.1:3;
 xt = 1+cos(2*pi*t)/4 + cos(2*pi*t*2)/2 + cos(2*pi*t*3)/3;
 plot(t,xt);
 %fft(xt)
@@ -7,36 +8,33 @@ coefficients = fourierSeries(xt);
 oSize = length(xt);
 xtcheck = invFourier(coefficients, t);
 hold on
-plot (t,xtcheck+0.1)
-T1 = false;
-if is_appEq(xt,xtcheck);
-    fprintf("First Test Passed.\n")
-    T1 = true;
-end
-edgecase = [1,3,3,3,3,3,3,2,3,2,1,3,1,3,3,3,3,3,3,2,3,2,1,3];
-et = 0.1:0.1:(length(edgecase)*0.1)
+plot (t,xtcheck+0.1);
+T = false(2,1);
+T(1,1) = test_DTFS(xt,t,"1");
+edgecase = [1,3,3,3,3,3,3,2,3,2,1,3,1,3,3,3,3,3,3,2,3,2,1,3,1,3,3,3,3,3];
+et = 0.1:0.1:(length(edgecase)*0.1);
 coefficients2 = fourierSeries(edgecase);
 edgecheck = invFourier(coefficients2,et);
-T2 = false;
-if is_appEq(edgecase, edgecheck);
-    fprintf("Second Test Passed.\n")
-    T2 = true;
+T(2,1) = test_DTFS(xt,t,"2");
+load_summary(T);
+function load_summary(T)
+fprintf("Summary of results:\n");
+    for i = 1:length(T)
+        if T
+            fprintf("Test " + num2str(i) + " Succeeded\n");
+        else
+            fprintf("Test " + num2str(i) + " Failed\n");
+        end
+    end
 end
-fprintf("Printing summary of results.\n")
-fprintf("First test:")
-if T1
-    fprintf(" True \n")
-else
-    fprintf(" False \n")
+function check = test_DTFS(xt,t, test_name)
+    check = is_appEq(invFourier(fourierSeries(xt),t),xt);
+    if check
+        fprintf("Test " + test_name + " Succeeded\n")
+    else
+        fprintf("Test " + test_name + " Failed\n")
+    end
 end
-    fprintf("Second test:")
-if T2
-    fprintf(" True \n")
-else
-    fprintf(" False \n")
-end
-
-
 function eq = is_appEq(arr1,arr2); %function to check if arr1 close toarr2
 eq = true;
 if length(arr1) ~= length(arr2);
