@@ -9,6 +9,7 @@ combinedCol = cat(3, col1, col2);
 meanData = mean(combinedCol, 3);
 
 % Based on the sampling rate, we know the dt between each data point
+Fsampling = 16000;
 dt = 1/Fsampling;
 N = length(meanData);
 t = 0 + (0:N-1)*dt;
@@ -21,7 +22,6 @@ xlabel('Time (s)');
 
 % Take the fourier transform to prepare for noise filtering
 spectrum = fft(meanData);
-Fsampling = 16000;
 N = length(spectrum);
 freq = horzcat(-linspace(0,N/2,N/2 )*Fsampling/N,linspace(N/2 + 1 ,0,N/2 + 1)*Fsampling/N);
 
