@@ -1,22 +1,22 @@
-xt = ones(1,100);%function x(t)
-ht = 0.01:0.01:2;%function h(t)
-Zt = convolute(xt,ht);%function Z(t), convoluted function
-cCheck = conv(0.01*xt,ht);%Our check for our test
-Zt; %comment out if you want to print @MickeyDang
-cCheck; %comment out if you want to print @MickeyDang
+
+t = 0.1:0.1:3;
+xt = 1+cos(2*pi*t)/4 + cos(2*pi*t*2)/2 + cos(2*pi*t*3)/3;
+plot(t,xt);
+%fft(xt)
+%plot(fft(xt))
+coefficients = fourierSeries(xt);
+oSize = length(xt);
+xtcheck = invFourier(coefficients, t);
+hold on
+plot (t,xtcheck+0.1);
 T = false(2,1);
-T(1,1) = test_convolute(xt,ht,"1"); %Bool for Test 1
-
-
-%Run Test two 
-t = 0.01:0.01:2;
-sint = sin(2*pi*t);
-cost = cos(2*pi*t);
-T(2,1) = test_convolute(xt,ht,"2"); %Bool for Test two
-
-%Load Summary
+T(1,1) = test_DTFS(xt,t,"1");
+edgecase = [1,3,3,3,3,3,3,2,3,2,1,3,1,3,3,3,3,3,3,2,3,2,1,3,1,3,3,3,3,3];
+et = 0.1:0.1:(length(edgecase)*0.1);
+coefficients2 = fourierSeries(edgecase);
+edgecheck = invFourier(coefficients2,et);
+T(2,1) = test_DTFS(xt,t,"2");
 load_summary(T);
-
 function load_summary(T)
 fprintf("Summary of results:\n");
     for i = 1:length(T)
@@ -27,15 +27,14 @@ fprintf("Summary of results:\n");
         end
     end
 end
-function check = test_convolute(xt,ht, test_name)
-    check = is_appEq(conv(0.01*xt,ht),convolute(xt,ht));
+function check = test_DTFS(xt,t, test_name)
+    check = is_appEq(invFourier(fourierSeries(xt),t),xt);
     if check
         fprintf("Test " + test_name + " Succeeded\n")
     else
         fprintf("Test " + test_name + " Failed\n")
     end
 end
-
 function eq = is_appEq(arr1,arr2); %function to check if arr1 close toarr2
 eq = true;
 if length(arr1) ~= length(arr2);
@@ -49,5 +48,4 @@ for i=1:length(arr1)
     %between the real and imaginary parts is less than 10^-6
     eq = eq && ( (real(arr1(i)-arr2(i))^2 < 10^-12) &&((imag(arr1(i)-arr2(i))^2 < 10^-12)));
 end
-
 end
